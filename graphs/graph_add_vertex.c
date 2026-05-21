@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 /**
  * graph_add_vertex - Adds a vertex to a graph
  * @graph: Pointer to the graph
