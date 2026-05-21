@@ -1,6 +1,11 @@
 #include <stdlib.h>
 #include "graphs.h"
 
+/**
+ * graph_create - creates and initializes a graph
+ *
+ * Return: pointer to graph, or NULL on failure
+ */
 graph_t *graph_create(void)
 {
     graph_t *graph;
