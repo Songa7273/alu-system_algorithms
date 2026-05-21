@@ -8,7 +8,7 @@
  * @content: String stored in the node
  * @index: Index of the node
  * @nb_edges: Number of edges
- * @edges: Array of pointers to connected nodes
+ * @edges: Array of connected nodes
  * @next: Pointer to the next node
  */
 typedef struct graph_node_s
