@@ -35,6 +35,37 @@ int connect_edge(vertex_t *src_v, vertex_t *dest_v)
 }
 
 /**
+ * remove_last_edge - Removes and frees the last edge in a vertex adjacency list
+ * @src_v: Vertex whose last edge should be removed
+ */
+static void remove_last_edge(vertex_t *src_v)
+{
+	edge_t *curr;
+	edge_t *prev;
+
+	if (!src_v || !src_v->edges)
+		return;
+
+	if (!src_v->edges->next)
+	{
+		free(src_v->edges);
+		src_v->edges = NULL;
+		return;
+	}
+
+	prev = NULL;
+	curr = src_v->edges;
+	while (curr->next)
+	{
+		prev = curr;
+		curr = curr->next;
+	}
+
+	prev->next = NULL;
+	free(curr);
+}
+
+/**
  * graph_add_edge - Establishes uni/bidirectional links between two vertices
  * @graph: Graph handle pointer
  * @src: String identifying source vertex
@@ -48,7 +79,8 @@ int graph_add_edge(graph_t *graph, const char *src, const char *dest,
 {
 	vertex_t *v = NULL, *src_v = NULL, *dest_v = NULL;
 
-	if (!graph || !src || !dest || (type != UNIDIRECTIONAL && type != BIDIRECTIONAL))
+	if (!graph || !src || !dest ||
+	    (type != UNIDIRECTIONAL && type != BIDIRECTIONAL))
 		return (0);
 
 	/* Locate both the source and destination vertices in the graph list */
@@ -72,7 +104,10 @@ int graph_add_edge(graph_t *graph, const char *src, const char *dest,
 	if (type == BIDIRECTIONAL && src_v != dest_v)
 	{
 		if (!connect_edge(dest_v, src_v))
+		{
+			remove_last_edge(src_v);
 			return (0);
+		}
 	}
 
 	return (1);
