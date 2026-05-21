@@ -17,6 +17,7 @@ typedef struct edge_s
  */
 typedef struct vertex_s
 {
+	size_t index;
 	char *content;
 	edge_t *edges;
 	struct vertex_s *next;
@@ -33,6 +34,7 @@ typedef struct graph_s
 
 /* functions */
 graph_t *graph_create(void);
+void graph_display(const graph_t *graph);
 vertex_t *graph_add_vertex(graph_t *graph, const char *str);
 
 #endif

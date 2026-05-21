@@ -1,9 +1,6 @@
 #include <stdlib.h>
 #include "graphs.h"
 
-/**
- * graph_create - creates an empty graph
- */
 graph_t *graph_create(void)
 {
 	graph_t *graph;

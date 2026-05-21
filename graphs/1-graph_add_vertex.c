@@ -7,17 +7,19 @@
  */
 vertex_t *graph_add_vertex(graph_t *graph, const char *str)
 {
-	vertex_t *new, *tmp;
+	vertex_t *new, *tmp, *last = NULL;
 
 	if (graph == NULL || str == NULL)
 		return (NULL);
 
-	/* check duplicates */
 	tmp = graph->vertices;
+
+	/* check duplicates + find last node */
 	while (tmp)
 	{
 		if (strcmp(tmp->content, str) == 0)
 			return (NULL);
+		last = tmp;
 		tmp = tmp->next;
 	}
 
@@ -33,9 +35,20 @@ vertex_t *graph_add_vertex(graph_t *graph, const char *str)
 	}
 
 	new->edges = NULL;
-	new->next = graph->vertices;
+	new->next = NULL;
 
-	graph->vertices = new;
+	/* assign index */
+	if (last == NULL)
+		new->index = 0;
+	else
+		new->index = last->index + 1;
+
+	/* insert at end */
+	if (last == NULL)
+		graph->vertices = new;
+	else
+		last->next = new;
+
 	graph->nb_vertices++;
 
 	return (new);
