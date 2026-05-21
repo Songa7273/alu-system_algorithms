@@ -3,23 +3,53 @@
 #include "graphs.h"
 
 /**
+ * add_vertex_end - adds a vertex at the end of the list
+ * @head: pointer to head of vertex list
+ * @new: new vertex to add
+ *
+ * Return: pointer to added vertex
+ */
+static vertex_t *add_vertex_end(vertex_t **head, vertex_t *new)
+{
+	vertex_t *tmp;
+	vertex_t *last;
+
+	tmp = *head;
+	last = NULL;
+
+	while (tmp)
+	{
+		last = tmp;
+		tmp = tmp->next;
+	}
+
+	if (last == NULL)
+		*head = new;
+	else
+		last->next = new;
+
+	return (new);
+}
+
+/**
  * graph_add_vertex - adds a vertex to a graph
+ * @graph: pointer to graph
+ * @str: string to store in vertex
+ *
+ * Return: pointer to new vertex, or NULL on failure
  */
 vertex_t *graph_add_vertex(graph_t *graph, const char *str)
 {
-	vertex_t *new, *tmp, *last = NULL;
+	vertex_t *new, *tmp;
 
 	if (graph == NULL || str == NULL)
 		return (NULL);
 
 	tmp = graph->vertices;
-
-	/* check duplicates + find last node */
 	while (tmp)
 	{
 		if (strcmp(tmp->content, str) == 0)
 			return (NULL);
-		last = tmp;
 		tmp = tmp->next;
 	}
 
@@ -37,17 +67,9 @@ vertex_t *graph_add_vertex(graph_t *graph, const char *str)
 	new->edges = NULL;
 	new->next = NULL;
 
-	/* assign index */
-	if (last == NULL)
-		new->index = 0;
-	else
-		new->index = last->index + 1;
+	new->index = graph->nb_vertices;
 
-	/* insert at end */
-	if (last == NULL)
-		graph->vertices = new;
-	else
-		last->next = new;
+	add_vertex_end(&graph->vertices, new);
 
 	graph->nb_vertices++;
 
