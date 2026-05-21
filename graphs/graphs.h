@@ -4,31 +4,33 @@
 #include <stddef.h>
 
 /**
- * struct graph_node_s - Graph node structure
- * @content: String stored in the node
- * @index: Index of the node
- * @nb_edges: Number of edges
- * @edges: Array of connected nodes
- * @next: Pointer to the next node
+ * vertex structure
  */
-typedef struct graph_node_s
+typedef struct vertex_s
 {
-	char *content;
-	size_t index;
-	size_t nb_edges;
-	struct graph_node_s **edges;
-	struct graph_node_s *next;
-} graph_node_t;
+    char *name;
+    struct edge_s *edges;
+    struct vertex_s *next;
+} vertex_t;
 
 /**
- * struct graph_s - Graph structure
- * @nodes: Linked list of graph nodes
+ * edge structure
+ */
+typedef struct edge_s
+{
+    vertex_t *dest;
+    struct edge_s *next;
+} edge_t;
+
+/**
+ * graph structure
  */
 typedef struct graph_s
 {
-	graph_node_t *nodes;
+    size_t nb_vertices;
+    vertex_t *vertices;
 } graph_t;
 
 graph_t *graph_create(void);
 
-#endif /* GRAPHS_H */
+#endif
