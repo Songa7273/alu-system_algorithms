@@ -4,21 +4,12 @@
 #include <stddef.h>
 
 /**
- * edge_type_e - type of edge
- */
-typedef enum edge_type_e
-{
-	UNIDIRECTIONAL,
-	BIDIRECTIONAL
-} edge_type_t;
-
-/**
  * edge_s - graph edge
  */
 typedef struct edge_s
 {
-	struct vertex_s *dest;
-	struct edge_s *next;
+    struct vertex_s *dest;
+    struct edge_s *next;
 } edge_t;
 
 /**
@@ -26,10 +17,10 @@ typedef struct edge_s
  */
 typedef struct vertex_s
 {
-	size_t index;
-	char *content;
-	edge_t *edges;
-	struct vertex_s *next;
+    size_t index;
+    char *content;
+    edge_t *edges;
+    struct vertex_s *next;
 } vertex_t;
 
 /**
@@ -37,15 +28,30 @@ typedef struct vertex_s
  */
 typedef struct graph_s
 {
-	size_t nb_vertices;
-	vertex_t *vertices;
+    size_t nb_vertices;
+    vertex_t *vertices;
 } graph_t;
 
-/* functions */
+/**
+ * edge_type_t - edge type
+ */
+typedef enum edge_type_e
+{
+    UNIDIRECTIONAL,
+    BIDIRECTIONAL
+} edge_type_t;
+
+/* ===== function prototypes ONLY (no code here) ===== */
+
 graph_t *graph_create(void);
+
 vertex_t *graph_add_vertex(graph_t *graph, const char *str);
-int graph_add_edge(graph_t *graph, const char *src,
-		   const char *dest, edge_type_t type);
+
+int graph_add_edge(graph_t *graph,
+                   const char *src,
+                   const char *dest,
+                   edge_type_t type);
+
 void graph_display(const graph_t *graph);
 
-#endif
+#endif /* GRAPHS_H */

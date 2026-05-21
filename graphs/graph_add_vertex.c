@@ -1,46 +1,32 @@
+#include "graphs.h"
 #include <stdlib.h>
 #include <string.h>
-#include "graphs.h"
 
 vertex_t *graph_add_vertex(graph_t *graph, const char *str)
 {
-	vertex_t *new, *tmp, *last = NULL;
+    vertex_t *vertex;
 
-	if (graph == NULL || str == NULL)
-		return (NULL);
+    if (!graph || !str)
+        return NULL;
 
-	tmp = graph->vertices;
+    vertex = malloc(sizeof(vertex_t));
+    if (!vertex)
+        return NULL;
 
-	while (tmp)
-	{
-		if (strcmp(tmp->content, str) == 0)
-			return (NULL);
-		last = tmp;
-		tmp = tmp->next;
-	}
+    vertex->content = strdup(str);
+    if (!vertex->content)
+    {
+        free(vertex);
+        return NULL;
+    }
 
-	new = malloc(sizeof(vertex_t));
-	if (new == NULL)
-		return (NULL);
+    vertex->index = graph->nb_vertices;
+    vertex->edges = NULL;
 
-	new->content = strdup(str);
-	if (new->content == NULL)
-	{
-		free(new);
-		return (NULL);
-	}
+    vertex->next = graph->vertices;
+    graph->vertices = vertex;
 
-	new->edges = NULL;
-	new->next = NULL;
+    graph->nb_vertices++;
 
-	new->index = graph->nb_vertices;
-
-	if (last == NULL)
-		graph->vertices = new;
-	else
-		last->next = new;
-
-	graph->nb_vertices++;
-
-	return (new);
+    return vertex;
 }
