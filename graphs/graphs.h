@@ -4,7 +4,16 @@
 #include <stddef.h>
 
 /**
- * struct edge_s - graph edge
+ * edge_type_e - type of edge
+ */
+typedef enum edge_type_e
+{
+	UNIDIRECTIONAL,
+	BIDIRECTIONAL
+} edge_type_t;
+
+/**
+ * edge_s - graph edge
  */
 typedef struct edge_s
 {
@@ -13,7 +22,7 @@ typedef struct edge_s
 } edge_t;
 
 /**
- * struct vertex_s - graph vertex
+ * vertex_s - graph vertex
  */
 typedef struct vertex_s
 {
@@ -24,7 +33,7 @@ typedef struct vertex_s
 } vertex_t;
 
 /**
- * struct graph_s - graph structure
+ * graph_s - graph structure
  */
 typedef struct graph_s
 {
@@ -34,7 +43,9 @@ typedef struct graph_s
 
 /* functions */
 graph_t *graph_create(void);
-void graph_display(const graph_t *graph);
 vertex_t *graph_add_vertex(graph_t *graph, const char *str);
+int graph_add_edge(graph_t *graph, const char *src,
+		   const char *dest, edge_type_t type);
+void graph_display(const graph_t *graph);
 
 #endif
