@@ -3,79 +3,124 @@
 #include <string.h>
 
 /**
- * connect_edge - Injects a single edge connection into a vertex adjacency list
- * @src_v: Source vertex pointer
- * @dest_v: Destination vertex pointer
+ * find_vertex - Finds a vertex in a graph by its content string
+ * @graph: Pointer to the graph
+ * @str: String to search for
  *
- * Return: 1 on success, 0 on memory failure
+ * Return: Pointer to the matching vertex, or NULL if not found
  */
-int connect_edge(vertex_t *src_v, vertex_t *dest_v)
+static vertex_t *find_vertex(graph_t *graph, const char *str)
 {
-	edge_t *edge, *curr;
+	vertex_t *current;
 
-	edge = malloc(sizeof(edge_t));
-	if (!edge)
+	for (current = graph->vertices; current; current = current->next)
+	{
+		if (strcmp(current->content, str) == 0)
+			return (current);
+	}
+
+	return (NULL);
+}
+
+/**
+ * append_edge - Appends a new edge to the end of a vertex adjacency list
+ * @source: Vertex receiving the new edge
+ * @destination: Vertex pointed to by the new edge
+ *
+ * Return: 1 on success, 0 on failure
+ */
+static int append_edge(vertex_t *source, vertex_t *destination)
+{
+	edge_t *new_edge;
+	edge_t *current;
+
+	new_edge = malloc(sizeof(edge_t));
+	if (!new_edge)
 		return (0);
 
-	edge->dest = dest_v;
-	edge->next = NULL;
+	new_edge->dest = destination;
+	new_edge->next = NULL;
 
-	if (!src_v->edges)
+	if (!source->edges)
 	{
-		src_v->edges = edge;
+		source->edges = new_edge;
+		return (1);
 	}
-	else
-	{
-		curr = src_v->edges;
-		while (curr->next)
-			curr = curr->next;
-		curr->next = edge;
-	}
+
+	current = source->edges;
+	while (current->next)
+		current = current->next;
+
+	current->next = new_edge;
 	return (1);
 }
 
 /**
- * graph_add_edge - Establishes uni/bidirectional links between two vertices
- * @graph: Graph handle pointer
- * @src: String identifying source vertex
- * @dest: String identifying destination vertex
- * @type: Connection type (UNIDIRECTIONAL or BIDIRECTIONAL)
+ * remove_last_edge - Removes the last edge from a vertex adjacency list
+ * @source: Vertex whose last edge should be removed
+ */
+static void remove_last_edge(vertex_t *source)
+{
+	edge_t *current;
+	edge_t *previous;
+
+	if (!source || !source->edges)
+		return;
+
+	if (!source->edges->next)
+	{
+		free(source->edges);
+		source->edges = NULL;
+		return;
+	}
+
+	previous = NULL;
+	current = source->edges;
+	while (current->next)
+	{
+		previous = current;
+		current = current->next;
+	}
+
+	previous->next = NULL;
+	free(current);
+}
+
+/**
+ * graph_add_edge - Adds a directional or bidirectional edge between vertices
+ * @graph: Pointer to the graph
+ * @src: String identifying the source vertex
+ * @dest: String identifying the destination vertex
+ * @type: Type of connection to create
  *
- * Return: 1 on absolute success, 0 on failure
+ * Return: 1 on success, 0 on failure
  */
 int graph_add_edge(graph_t *graph, const char *src, const char *dest,
 		   graph_edge_type_t type)
 {
-	vertex_t *v = NULL, *src_v = NULL, *dest_v = NULL;
+	vertex_t *source;
+	vertex_t *destination;
 
-	if (!graph || !src || !dest || (type != UNIDIRECTIONAL && type != BIDIRECTIONAL))
+	if (!graph || !src || !dest ||
+	    (type != UNIDIRECTIONAL && type != BIDIRECTIONAL))
 		return (0);
 
-	/* Locate both the source and destination vertices in the graph list */
-	for (v = graph->vertices; v; v = v->next)
+	source = find_vertex(graph, src);
+	destination = find_vertex(graph, dest);
+	if (!source || !destination)
+		return (0);
+
+	if (!append_edge(source, destination))
+		return (0);
+
+	if (type == BIDIRECTIONAL)
 	{
-		if (strcmp(v->content, src) == 0)
-			src_v = v;
-		if (strcmp(v->content, dest) == 0)
-			dest_v = v;
-	}
-
-	/* Error check: verify both vertices exist */
-	if (!src_v || !dest_v)
-		return (0);
-
-	/* Establish the primary forward link */
-	if (!connect_edge(src_v, dest_v))
-		return (0);
-
-	/* If bidirectional, establish the reverse link back to source */
-	if (type == BIDIRECTIONAL && src_v != dest_v)
-	{
-		if (!connect_edge(dest_v, src_v))
+		if (!append_edge(destination, source))
+		{
+			remove_last_edge(source);
 			return (0);
+		}
 	}
 
 	return (1);
 }
-
-
