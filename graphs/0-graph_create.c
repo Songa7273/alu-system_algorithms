@@ -2,10 +2,9 @@
 #include "graphs.h"
 
 /**
- * graph_create - creates a graph
+ * graph_create - Creates a graph
  *
- * Return: pointer to the newly created graph,
- * or NULL on failure
+ * Return: Pointer to the created graph, or NULL on failure
  */
 graph_t *graph_create(void)
 {

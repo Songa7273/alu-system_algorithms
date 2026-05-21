@@ -4,13 +4,12 @@
 #include <stddef.h>
 
 /**
- * struct graph_node_s - graph node structure
- *
- * @content: string stored in the node
- * @index: index of the node
- * @nb_edges: number of edges
- * @edges: array of pointers to connected nodes
- * @next: pointer to the next node
+ * struct graph_node_s - Graph node structure
+ * @content: String stored in the node
+ * @index: Index of the node
+ * @nb_edges: Number of edges
+ * @edges: Array of pointers to connected nodes
+ * @next: Pointer to the next node
  */
 typedef struct graph_node_s
 {
@@ -22,9 +21,8 @@ typedef struct graph_node_s
 } graph_node_t;
 
 /**
- * struct graph_s - graph structure
- *
- * @nodes: linked list of graph nodes
+ * struct graph_s - Graph structure
+ * @nodes: Linked list of graph nodes
  */
 typedef struct graph_s
 {
