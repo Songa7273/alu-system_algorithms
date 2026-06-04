@@ -3,8 +3,7 @@
 #include "huffman.h"
 
 /**
- * free_tree - frees a binary tree
- * @tree: root of tree
+ * free_tree - frees Huffman tree
  */
 static void free_tree(binary_tree_node_t *tree)
 {
@@ -13,26 +12,21 @@ static void free_tree(binary_tree_node_t *tree)
 
 	free_tree(tree->left);
 	free_tree(tree->right);
-
 	free(tree->data);
 	free(tree);
 }
 
 /**
- * print_codes - prints Huffman codes
- * @tree: Huffman tree
- * @code: code buffer
- * @depth: current depth
+ * print_codes - DFS traversal
  */
-static void print_codes(binary_tree_node_t *tree,
-	char *code, int depth)
+static void print_codes(binary_tree_node_t *tree, char *code, int depth)
 {
 	symbol_t *symbol;
 
 	if (!tree)
 		return;
 
-	symbol = (symbol_t *)tree->data;
+	symbol = tree->data;
 
 	if (!tree->left && !tree->right)
 	{
@@ -49,12 +43,7 @@ static void print_codes(binary_tree_node_t *tree,
 }
 
 /**
- * huffman_codes - builds Huffman tree and prints codes
- * @data: array of chars
- * @freq: array of frequencies
- * @size: size of arrays
- *
- * Return: 1 on success, 0 on failure
+ * huffman_codes - main function
  */
 int huffman_codes(char *data, size_t *freq, size_t size)
 {
@@ -66,7 +55,6 @@ int huffman_codes(char *data, size_t *freq, size_t size)
 		return (0);
 
 	print_codes(root, code, 0);
-
 	free_tree(root);
 
 	return (1);

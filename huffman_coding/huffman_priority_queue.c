@@ -1,54 +1,41 @@
+#include <stdlib.h>
+#include "heap.h"
 #include "huffman.h"
 
 /**
- * compare_frequencies - compares two symbol nodes
+ * compare_frequencies - compares two heap nodes
  * @p1: first node
  * @p2: second node
  *
- * Return: comparison result
+ * Return: negative if p1 < p2, positive if p1 > p2
  */
 int compare_frequencies(void *p1, void *p2)
 {
-	binary_tree_node_t *node1;
-	binary_tree_node_t *node2;
-	symbol_t *symbol1;
-	symbol_t *symbol2;
+	binary_tree_node_t *n1 = p1;
+	binary_tree_node_t *n2 = p2;
 
-	node1 = (binary_tree_node_t *)p1;
-	node2 = (binary_tree_node_t *)p2;
+	symbol_t *s1 = n1->data;
+	symbol_t *s2 = n2->data;
 
-	symbol1 = (symbol_t *)node1->data;
-	symbol2 = (symbol_t *)node2->data;
+	if (s1->freq != s2->freq)
+		return (s1->freq - s2->freq);
 
-	if (symbol1->freq < symbol2->freq)
-		return (-1);
-
-	if (symbol1->freq > symbol2->freq)
-		return (1);
-
-	if (symbol1->data < symbol2->data)
-		return (-1);
-
-	if (symbol1->data > symbol2->data)
-		return (1);
-
-	return (0);
+	/* tie-breaker (VERY IMPORTANT FOR ALU) */
+	return (s1->data - s2->data);
 }
 
 /**
- * huffman_priority_queue - creates a min-heap priority queue
- * @data: array of characters
- * @freq: array of frequencies
- * @size: size of arrays
- *
- * Return: pointer to heap, or NULL on failure
+ * huffman_priority_queue - builds min heap
  */
 heap_t *huffman_priority_queue(char *data, size_t *freq, size_t size)
 {
 	heap_t *heap;
-	symbol_t *symbol;
 	binary_tree_node_t *node;
+	symbol_t *symbol;
 	size_t i;
+
+	if (!data || !freq || size == 0)
+		return (NULL);
 
 	heap = heap_create(compare_frequencies);
 	if (!heap)
