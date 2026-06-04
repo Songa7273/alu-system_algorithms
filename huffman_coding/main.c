@@ -1,19 +1,22 @@
 #include <stdio.h>
+#include "heap.h"
 #include "huffman.h"
 
 int main(void)
 {
-	symbol_t *s1;
-	symbol_t *s2;
+	heap_t *pq;
+	char data[] = {'a', 'b', 'c', 'd', 'e', 'f'};
+	size_t freq[] = {6, 11, 12, 13, 16, 36};
+	size_t size = sizeof(data) / sizeof(data[0]);
 
-	s1 = symbol_create('d', 3);
-	s2 = symbol_create('H', 98);
-
-	if (!s1 || !s2)
+	pq = huffman_priority_queue(data, freq, size);
+	if (!pq)
+	{
+		printf("Failed\n");
 		return (1);
+	}
 
-	printf("Symbol: data(%c) frequency(%lu)\n", s1->data, s1->freq);
-	printf("Symbol: data(%c) frequency(%lu)\n", s2->data, s2->freq);
+	printf("Priority queue created. Size: %lu\n", pq->size);
 
 	return (0);
 }
