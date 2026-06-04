@@ -2,7 +2,11 @@
 #include <stdlib.h>
 
 /**
- * swap_data - swaps node data
+ * swap_data - swaps data between two nodes
+ * @a: first node
+ * @b: second node
+ *
+ * Return: void
  */
 static void swap_data(binary_tree_node_t *a, binary_tree_node_t *b)
 {
@@ -13,7 +17,11 @@ static void swap_data(binary_tree_node_t *a, binary_tree_node_t *b)
 }
 
 /**
- * heapify_down - restores min heap property
+ * heapify_down - restores heap property after extraction
+ * @node: root node to heapify
+ * @heap: pointer to heap structure
+ *
+ * Return: void
  */
 static void heapify_down(binary_tree_node_t *node, heap_t *heap)
 {
@@ -40,7 +48,10 @@ static void heapify_down(binary_tree_node_t *node, heap_t *heap)
 }
 
 /**
- * get_last_node - BFS last node in heap
+ * get_last_node - finds last node in heap using BFS
+ * @heap: pointer to heap
+ *
+ * Return: pointer to last node or NULL
  */
 static binary_tree_node_t *get_last_node(heap_t *heap)
 {
@@ -70,10 +81,10 @@ static binary_tree_node_t *get_last_node(heap_t *heap)
 }
 
 /**
- * heap_extract - extracts root of Min Binary Heap
- * @heap: heap to extract from
+ * heap_extract - extracts root of a Min Binary Heap
+ * @heap: pointer to heap
  *
- * Return: pointer to data or NULL
+ * Return: pointer to extracted data or NULL on failure
  */
 void *heap_extract(heap_t *heap)
 {
