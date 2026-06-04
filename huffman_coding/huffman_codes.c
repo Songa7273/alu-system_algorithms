@@ -1,5 +1,22 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "huffman.h"
+
+/**
+ * free_tree - frees a binary tree
+ * @tree: root of tree
+ */
+static void free_tree(binary_tree_node_t *tree)
+{
+	if (!tree)
+		return;
+
+	free_tree(tree->left);
+	free_tree(tree->right);
+
+	free(tree->data);
+	free(tree);
+}
 
 /**
  * print_codes - prints Huffman codes
@@ -50,7 +67,7 @@ int huffman_codes(char *data, size_t *freq, size_t size)
 
 	print_codes(root, code, 0);
 
-	binary_tree_delete(root);
+	free_tree(root);
 
 	return (1);
 }
