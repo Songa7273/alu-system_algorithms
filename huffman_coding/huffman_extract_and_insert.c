@@ -25,9 +25,12 @@ int huffman_extract_and_insert(heap_t *priority_queue)
 		return (0);
 	}
 
-	/* CORRECT ACCESS: heap node -> data -> symbol */
-	s1 = ((binary_tree_node_t *)first->data)->data;
-	s2 = ((binary_tree_node_t *)second->data)->data;
+	/* ✅ CORRECT: direct symbol access */
+	s1 = (symbol_t *)first->data;
+	s2 = (symbol_t *)second->data;
+
+	if (!s1 || !s2)
+		return (0);
 
 	new_symbol = malloc(sizeof(symbol_t));
 	if (!new_symbol)
