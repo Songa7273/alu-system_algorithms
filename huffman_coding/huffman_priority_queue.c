@@ -1,41 +1,56 @@
-#include "heap.h"
 #include "huffman.h"
-#include <stdlib.h>
 
 /**
- * symbol_cmp - compares two heap nodes by symbol frequency
- * @a: first node
- * @b: second node
+ * compare_frequencies - compares two symbol nodes
+ * @p1: first node
+ * @p2: second node
  *
- * Return: difference between frequencies (min heap)
+ * Return: comparison result
  */
-static int symbol_cmp(void *a, void *b)
+int compare_frequencies(void *p1, void *p2)
 {
-	binary_tree_node_t *na = (binary_tree_node_t *)a;
-	binary_tree_node_t *nb = (binary_tree_node_t *)b;
+	binary_tree_node_t *node1;
+	binary_tree_node_t *node2;
+	symbol_t *symbol1;
+	symbol_t *symbol2;
 
-	symbol_t *sa = (symbol_t *)na->data;
-	symbol_t *sb = (symbol_t *)nb->data;
+	node1 = (binary_tree_node_t *)p1;
+	node2 = (binary_tree_node_t *)p2;
 
-	return ((int)(sa->freq - sb->freq));
+	symbol1 = (symbol_t *)node1->data;
+	symbol2 = (symbol_t *)node2->data;
+
+	if (symbol1->freq < symbol2->freq)
+		return (-1);
+
+	if (symbol1->freq > symbol2->freq)
+		return (1);
+
+	if (symbol1->data < symbol2->data)
+		return (-1);
+
+	if (symbol1->data > symbol2->data)
+		return (1);
+
+	return (0);
 }
 
 /**
- * huffman_priority_queue - builds a min heap (priority queue)
+ * huffman_priority_queue - creates a min-heap priority queue
  * @data: array of characters
  * @freq: array of frequencies
- * @size: number of elements
+ * @size: size of arrays
  *
- * Return: pointer to created heap, or NULL on failure
+ * Return: pointer to heap, or NULL on failure
  */
 heap_t *huffman_priority_queue(char *data, size_t *freq, size_t size)
 {
 	heap_t *heap;
-	binary_tree_node_t *node;
 	symbol_t *symbol;
+	binary_tree_node_t *node;
 	size_t i;
 
-	heap = heap_create(symbol_cmp);
+	heap = heap_create(compare_frequencies);
 	if (!heap)
 		return (NULL);
 
@@ -49,7 +64,8 @@ heap_t *huffman_priority_queue(char *data, size_t *freq, size_t size)
 		if (!node)
 			return (NULL);
 
-		heap_insert(heap, node);
+		if (!heap_insert(heap, node))
+			return (NULL);
 	}
 
 	return (heap);

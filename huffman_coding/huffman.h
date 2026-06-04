@@ -5,7 +5,9 @@
 #include "heap.h"
 
 /**
- * struct symbol_s - Huffman symbol
+ * struct symbol_s - Stores a symbol and its frequency
+ * @data: Character represented by the symbol
+ * @freq: Frequency of the character
  */
 typedef struct symbol_s
 {
@@ -21,5 +23,7 @@ heap_t *huffman_priority_queue(char *data, size_t *freq, size_t size);
 int huffman_extract_and_insert(heap_t *priority_queue);
 binary_tree_node_t *huffman_tree(char *data, size_t *freq, size_t size);
 int huffman_codes(char *data, size_t *freq, size_t size);
+int compare_frequencies(void *p1, void *p2);
+void binary_tree_delete(binary_tree_node_t *tree);
 
 #endif /* HUFFMAN_H */
