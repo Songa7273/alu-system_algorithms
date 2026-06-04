@@ -2,15 +2,80 @@
 #include <stdio.h>
 #include "pathfinding.h"
 
-/* Directions */
-#define RIGHT 0
-#define BOTTOM 1
-#define LEFT 2
-#define TOP 3
+/* ========================= */
+/* QUEUE IMPLEMENTATION */
+/* ========================= */
 
-/**
- * is_valid - check if cell is valid
- */
+queue_t *queue_create(void)
+{
+	queue_t *q = malloc(sizeof(queue_t));
+
+	if (!q)
+		return NULL;
+
+	q->front = NULL;
+	q->rear = NULL;
+	return q;
+}
+
+void enqueue(queue_t *q, void *data)
+{
+	queue_node_t *node = malloc(sizeof(queue_node_t));
+
+	if (!q || !node)
+		return;
+
+	node->data = data;
+	node->next = NULL;
+
+	if (!q->rear)
+	{
+		q->front = q->rear = node;
+		return;
+	}
+
+	q->rear->next = node;
+	q->rear = node;
+}
+
+void *dequeue(queue_t *q)
+{
+	queue_node_t *tmp;
+	void *data;
+
+	if (!q || !q->front)
+		return NULL;
+
+	tmp = q->front;
+	data = tmp->data;
+	q->front = q->front->next;
+
+	if (!q->front)
+		q->rear = NULL;
+
+	free(tmp);
+	return data;
+}
+
+void queue_push_front(queue_t *q, void *data)
+{
+	queue_node_t *node = malloc(sizeof(queue_node_t));
+
+	if (!q || !node)
+		return;
+
+	node->data = data;
+	node->next = q->front;
+	q->front = node;
+
+	if (!q->rear)
+		q->rear = node;
+}
+
+/* ========================= */
+/* BACKTRACKING ARRAY */
+/* ========================= */
+
 static int is_valid(char **map, int rows, int cols,
                     int x, int y, char **visited)
 {
@@ -23,9 +88,6 @@ static int is_valid(char **map, int rows, int cols,
 	return 1;
 }
 
-/**
- * dfs - recursive backtracking search (C90 compliant)
- */
 static queue_t *dfs(char **map, int rows, int cols,
                     int x, int y,
                     point_t const *target,
@@ -43,7 +105,6 @@ static queue_t *dfs(char **map, int rows, int cols,
 
 	visited[x][y] = 1;
 
-	/* base case */
 	if (x == target->x && y == target->y)
 	{
 		path = queue_create();
@@ -88,9 +149,6 @@ static queue_t *dfs(char **map, int rows, int cols,
 	return NULL;
 }
 
-/**
- * backtracking_array - entry point
- */
 queue_t *backtracking_array(char **map, int rows, int cols,
                              point_t const *start,
                              point_t const *target)
