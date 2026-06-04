@@ -3,6 +3,8 @@
 
 /**
  * swap_data - swaps data between two nodes
+ * @a: first node
+ * @b: second node
  */
 static void swap_data(binary_tree_node_t *a, binary_tree_node_t *b)
 {
@@ -13,30 +15,33 @@ static void swap_data(binary_tree_node_t *a, binary_tree_node_t *b)
 }
 
 /**
- * heap_insert - inserts value into Min Binary Heap
+ * heapify_up - restores min heap property
+ * @node: node to heapify
+ * @heap: heap structure
  */
-binary_tree_node_t *heap_insert(heap_t *heap, void *data)
+static void heapify_up(binary_tree_node_t *node, heap_t *heap)
 {
-	binary_tree_node_t *node, *tmp, **queue;
-	size_t front = 0, rear = 0;
-
-	if (!heap || !data)
-		return (NULL);
-
-	node = binary_tree_node(NULL, data);
-	if (!node)
-		return (NULL);
-
-	if (!heap->root)
+	while (node->parent &&
+	       heap->data_cmp(node->parent->data, node->data) > 0)
 	{
-		heap->root = node;
-		heap->size++;
-		return (node);
+		swap_data(node, node->parent);
+		node = node->parent;
 	}
+}
+
+/**
+ * insert_bfs - finds insertion spot using BFS
+ * @heap: heap
+ * @node: new node
+ */
+static void insert_bfs(heap_t *heap, binary_tree_node_t *node)
+{
+	binary_tree_node_t **queue, *tmp;
+	size_t front = 0, rear = 0;
 
 	queue = malloc(sizeof(binary_tree_node_t *) * (heap->size + 2));
 	if (!queue)
-		return (NULL);
+		return;
 
 	queue[rear++] = heap->root;
 
@@ -64,13 +69,35 @@ binary_tree_node_t *heap_insert(heap_t *heap, void *data)
 	}
 
 	free(queue);
+}
 
-	while (node->parent &&
-	       heap->data_cmp(node->parent->data, node->data) > 0)
+/**
+ * heap_insert - inserts a value in a Min Binary Heap
+ * @heap: pointer to heap
+ * @data: data to insert
+ *
+ * Return: pointer to inserted node or NULL
+ */
+binary_tree_node_t *heap_insert(heap_t *heap, void *data)
+{
+	binary_tree_node_t *node;
+
+	if (!heap || !data)
+		return (NULL);
+
+	node = binary_tree_node(NULL, data);
+	if (!node)
+		return (NULL);
+
+	if (!heap->root)
 	{
-		swap_data(node, node->parent);
-		node = node->parent;
+		heap->root = node;
+		heap->size++;
+		return (node);
 	}
+
+	insert_bfs(heap, node);
+	heapify_up(node, heap);
 
 	heap->size++;
 
