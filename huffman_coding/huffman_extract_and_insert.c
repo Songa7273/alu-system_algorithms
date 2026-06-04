@@ -10,8 +10,6 @@ int huffman_extract_and_insert(heap_t *priority_queue)
 	symbol_t *s1;
 	symbol_t *s2;
 	symbol_t *new_symbol;
-	binary_tree_node_t *left_symbol_node;
-	binary_tree_node_t *right_symbol_node;
 
 	if (!priority_queue || !priority_queue->root)
 		return (0);
@@ -27,12 +25,9 @@ int huffman_extract_and_insert(heap_t *priority_queue)
 		return (0);
 	}
 
-	/* IMPORTANT FIX: correctly access symbol_t */
-	left_symbol_node = (binary_tree_node_t *)first->data;
-	right_symbol_node = (binary_tree_node_t *)second->data;
-
-	s1 = (symbol_t *)left_symbol_node->data;
-	s2 = (symbol_t *)right_symbol_node->data;
+	/* CORRECT ACCESS: heap node -> data -> symbol */
+	s1 = ((binary_tree_node_t *)first->data)->data;
+	s2 = ((binary_tree_node_t *)second->data)->data;
 
 	new_symbol = malloc(sizeof(symbol_t));
 	if (!new_symbol)
