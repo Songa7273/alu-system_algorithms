@@ -3,7 +3,11 @@
 #include <stdlib.h>
 
 /**
- * symbol_cmp - compares two heap nodes containing symbols
+ * symbol_cmp - compares two heap nodes by symbol frequency
+ * @a: first node
+ * @b: second node
+ *
+ * Return: difference between frequencies (min heap)
  */
 static int symbol_cmp(void *a, void *b)
 {
@@ -17,7 +21,12 @@ static int symbol_cmp(void *a, void *b)
 }
 
 /**
- * huffman_priority_queue - builds priority queue
+ * huffman_priority_queue - builds a min heap (priority queue)
+ * @data: array of characters
+ * @freq: array of frequencies
+ * @size: number of elements
+ *
+ * Return: pointer to created heap, or NULL on failure
  */
 heap_t *huffman_priority_queue(char *data, size_t *freq, size_t size)
 {
