@@ -1,12 +1,12 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "heap.h"
 
-int int_cmp(void *p1, void *p2)
+int int_cmp(void *a, void *b)
 {
-	int *a = p1;
-	int *b = p2;
-	return (*a - *b);
+	int x = *(int *)a;
+	int y = *(int *)b;
+	return (x - y);
 }
 
 int main(void)
@@ -26,6 +26,5 @@ int main(void)
 	}
 
 	printf("Heap size: %lu\n", heap->size);
-
 	return (0);
 }
