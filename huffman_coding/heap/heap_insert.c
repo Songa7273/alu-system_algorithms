@@ -2,23 +2,23 @@
 #include <stdlib.h>
 
 /**
- * swap_data - swaps node data
+ * swap_data - swaps data between two nodes
  */
 static void swap_data(binary_tree_node_t *a, binary_tree_node_t *b)
 {
 	void *tmp = a->data;
+
 	a->data = b->data;
 	b->data = tmp;
 }
 
 /**
- * heap_insert - inserts node in Min Heap
+ * heap_insert - inserts value into Min Binary Heap
  */
 binary_tree_node_t *heap_insert(heap_t *heap, void *data)
 {
-	binary_tree_node_t **queue;
-	binary_tree_node_t *node, *tmp;
-	size_t front, rear;
+	binary_tree_node_t *node, *tmp, **queue;
+	size_t front = 0, rear = 0;
 
 	if (!heap || !data)
 		return (NULL);
@@ -38,9 +38,7 @@ binary_tree_node_t *heap_insert(heap_t *heap, void *data)
 	if (!queue)
 		return (NULL);
 
-	queue[0] = heap->root;
-	front = 0;
-	rear = 1;
+	queue[rear++] = heap->root;
 
 	while (front < rear)
 	{
@@ -67,7 +65,6 @@ binary_tree_node_t *heap_insert(heap_t *heap, void *data)
 
 	free(queue);
 
-	/* bubble up */
 	while (node->parent &&
 	       heap->data_cmp(node->parent->data, node->data) > 0)
 	{
@@ -76,5 +73,6 @@ binary_tree_node_t *heap_insert(heap_t *heap, void *data)
 	}
 
 	heap->size++;
+
 	return (node);
 }
