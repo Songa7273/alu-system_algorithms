@@ -2,13 +2,6 @@
 #include "heap.h"
 #include "huffman.h"
 
-/**
- * huffman_extract_and_insert - extracts two minimum nodes from the heap
- * and inserts their merged parent node
- * @priority_queue: pointer to heap
- *
- * Return: 1 on success, 0 on failure
- */
 int huffman_extract_and_insert(heap_t *priority_queue)
 {
 	binary_tree_node_t *first;
@@ -17,6 +10,8 @@ int huffman_extract_and_insert(heap_t *priority_queue)
 	symbol_t *s1;
 	symbol_t *s2;
 	symbol_t *new_symbol;
+	binary_tree_node_t *left_symbol_node;
+	binary_tree_node_t *right_symbol_node;
 
 	if (!priority_queue || !priority_queue->root)
 		return (0);
@@ -32,19 +27,32 @@ int huffman_extract_and_insert(heap_t *priority_queue)
 		return (0);
 	}
 
-	s1 = ((binary_tree_node_t *)first->data)->data;
-	s2 = ((binary_tree_node_t *)second->data)->data;
+	/* IMPORTANT FIX: correctly access symbol_t */
+	left_symbol_node = (binary_tree_node_t *)first->data;
+	right_symbol_node = (binary_tree_node_t *)second->data;
+
+	s1 = (symbol_t *)left_symbol_node->data;
+	s2 = (symbol_t *)right_symbol_node->data;
 
 	new_symbol = malloc(sizeof(symbol_t));
 	if (!new_symbol)
+	{
+		heap_insert(priority_queue, first);
+		heap_insert(priority_queue, second);
 		return (0);
+	}
 
 	new_symbol->data = -1;
 	new_symbol->freq = s1->freq + s2->freq;
 
 	parent = binary_tree_node(NULL, new_symbol);
 	if (!parent)
+	{
+		free(new_symbol);
+		heap_insert(priority_queue, first);
+		heap_insert(priority_queue, second);
 		return (0);
+	}
 
 	parent->left = first;
 	parent->right = second;
