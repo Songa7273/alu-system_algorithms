@@ -51,7 +51,6 @@ binary_tree_node_t *heap_insert(heap_t *heap, void *data)
 	if (!node)
 		return (NULL);
 
-	/* First node */
 	if (!heap->root)
 	{
 		heap->root = node;
@@ -69,9 +68,8 @@ binary_tree_node_t *heap_insert(heap_t *heap, void *data)
 	else
 		parent->right = node;
 
-	/* Bubble up for min heap */
 	while (node->parent &&
-		   heap->data_cmp(node->parent->data, node->data) > 0)
+	       heap->data_cmp(node->parent->data, node->data) > 0)
 	{
 		swap_data(node, node->parent);
 		node = node->parent;
