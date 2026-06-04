@@ -1,48 +1,24 @@
-#include <stdlib.h>
 #include "heap.h"
+#include <stdlib.h>
 
 /**
  * swap_data - swaps node data
  */
 static void swap_data(binary_tree_node_t *a, binary_tree_node_t *b)
 {
-	void *tmp;
-
-	tmp = a->data;
+	void *tmp = a->data;
 	a->data = b->data;
 	b->data = tmp;
 }
 
 /**
- * get_node - finds insertion parent using binary path
- */
-static binary_tree_node_t *get_node(heap_t *heap, size_t index)
-{
-	binary_tree_node_t *node;
-	size_t mask;
-
-	node = heap->root;
-	mask = 1UL << (sizeof(size_t) * 8 - 2);
-
-	while (mask > 1)
-	{
-		if (index & mask)
-			node = node->right;
-		else
-			node = node->left;
-		mask >>= 1;
-	}
-
-	return (node);
-}
-
-/**
- * heap_insert - inserts a value in a Min Binary Heap
+ * heap_insert - inserts node in Min Heap
  */
 binary_tree_node_t *heap_insert(heap_t *heap, void *data)
 {
-	binary_tree_node_t *node, *parent;
-	size_t index;
+	binary_tree_node_t **queue;
+	binary_tree_node_t *node, *tmp;
+	size_t front, rear;
 
 	if (!heap || !data)
 		return (NULL);
@@ -58,16 +34,40 @@ binary_tree_node_t *heap_insert(heap_t *heap, void *data)
 		return (node);
 	}
 
-	index = heap->size + 1;
-	parent = get_node(heap, index >> 1);
+	queue = malloc(sizeof(binary_tree_node_t *) * (heap->size + 2));
+	if (!queue)
+		return (NULL);
 
-	node->parent = parent;
+	queue[0] = heap->root;
+	front = 0;
+	rear = 1;
 
-	if (!(index & 1))
-		parent->left = node;
-	else
-		parent->right = node;
+	while (front < rear)
+	{
+		tmp = queue[front++];
 
+		if (!tmp->left)
+		{
+			tmp->left = node;
+			node->parent = tmp;
+			break;
+		}
+		else
+			queue[rear++] = tmp->left;
+
+		if (!tmp->right)
+		{
+			tmp->right = node;
+			node->parent = tmp;
+			break;
+		}
+		else
+			queue[rear++] = tmp->right;
+	}
+
+	free(queue);
+
+	/* bubble up */
 	while (node->parent &&
 	       heap->data_cmp(node->parent->data, node->data) > 0)
 	{
