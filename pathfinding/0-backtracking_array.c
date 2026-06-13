@@ -1,15 +1,12 @@
 #include "pathfinding.h"
 
 /**
- * add_point - add a point to the path queue
- * @path: queue storing path
- * @p: point to add
+ * add_point - store point in path
  */
 static void add_point(queue_t *path, point_t p)
 {
-	point_t *copy;
+	point_t *copy = malloc(sizeof(point_t));
 
-	copy = malloc(sizeof(point_t));
 	if (!copy)
 		return;
 
@@ -18,85 +15,68 @@ static void add_point(queue_t *path, point_t p)
 }
 
 /**
- * dfs - depth first search for pathfinding
- * @grid: map grid
- * @rows: number of rows
- * @cols: number of columns
- * @current: current position
- * @goal: target position
- * @visited: visited matrix
- * @path: queue storing path
- *
- * Return: 1 if path found, 0 otherwise
+ * BFS node
  */
-static int dfs(char **grid, int rows, int cols,
-		point_t current, point_t goal,
-		int **visited, queue_t *path)
+typedef struct bfs_node_s
 {
-	int dx[4] = {1, -1, 0, 0};
-	int dy[4] = {0, 0, 1, -1};
-	int i;
-
-	if (current.x == goal.x && current.y == goal.y)
-	{
-		add_point(path, current);
-		return (1);
-	}
-
-	if (visited[current.x][current.y])
-		return (0);
-
-	visited[current.x][current.y] = 1;
-	add_point(path, current);
-
-	for (i = 0; i < 4; i++)
-	{
-		point_t next;
-
-		next.x = current.x + dx[i];
-		next.y = current.y + dy[i];
-
-		if (next.x >= 0 && next.y >= 0 &&
-			next.x < rows && next.y < cols &&
-			grid[next.x][next.y] == '0')
-		{
-			if (dfs(grid, rows, cols, next, goal, visited, path))
-				return (1);
-		}
-	}
-
-	return (0);
-}
+	point_t p;
+	point_t parent;
+	int has_parent;
+} bfs_node_t;
 
 /**
- * backtracking_array - finds path using DFS backtracking
- * @grid: map grid
- * @rows: number of rows
- * @cols: number of columns
- * @start: starting position
- * @goal: target position
- *
- * Return: queue containing path, or NULL on failure
+ * backtracking_array - BFS shortest path
  */
 queue_t *backtracking_array(char **grid, int rows, int cols,
 				point_t start, point_t goal)
 {
-	queue_t *path;
+	queue_t *queue = create_queue();
+	queue_t *path = create_queue();
 	int **visited;
-	int i;
-
-	path = create_queue();
-	if (!path)
-		return (NULL);
+	point_t dirs[4] = {{1,0},{-1,0},{0,1},{0,-1}};
+	int i, x, y;
 
 	visited = malloc(sizeof(int *) * rows);
-	if (!visited)
-		return (NULL);
-
 	for (i = 0; i < rows; i++)
 		visited[i] = calloc(cols, sizeof(int));
 
-	dfs(grid, rows, cols, start, goal, visited, path);
+	enqueue(queue, &start);
+
+	while (queue->front)
+	{
+		point_t *cur = dequeue(queue);
+
+		if (cur->x == goal.x && cur->y == goal.y)
+		{
+			add_point(path, *cur);
+			break;
+		}
+
+		if (visited[cur->x][cur->y])
+			continue;
+
+		visited[cur->x][cur->y] = 1;
+		add_point(path, *cur);
+
+		for (i = 0; i < 4; i++)
+		{
+			x = cur->x + dirs[i].x;
+			y = cur->y + dirs[i].y;
+
+			if (x >= 0 && y >= 0 && x < rows && y < cols
+				&& grid[x][y] == '0')
+			{
+				point_t *next = malloc(sizeof(point_t));
+
+				next->x = x;
+				next->y = y;
+
+				enqueue(queue, next);
+			}
+		}
+	}
+
+	free_queue(queue);
 
 	for (i = 0; i < rows; i++)
 		free(visited[i]);
