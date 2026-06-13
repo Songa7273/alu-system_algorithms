@@ -3,45 +3,47 @@
 
 #include <stdlib.h>
 
-/* ===================== */
-/* Structures */
-/* ===================== */
-
+/**
+ * struct point_s - point in grid
+ * @x: x coordinate
+ * @y: y coordinate
+ */
 typedef struct point_s
 {
 	int x;
 	int y;
 } point_t;
 
-/* Queue node (from libqueues) */
+/**
+ * struct queue_node_s - queue node
+ * @data: stored data
+ * @next: next node
+ */
 typedef struct queue_node_s
 {
 	void *data;
 	struct queue_node_s *next;
 } queue_node_t;
 
-/* Queue structure */
+/**
+ * struct queue_s - queue structure
+ * @front: front node
+ * @rear: rear node
+ */
 typedef struct queue_s
 {
 	queue_node_t *front;
 	queue_node_t *rear;
 } queue_t;
 
-/* ===================== */
-/* Queue functions (from libqueues) */
-/* ===================== */
-
-queue_t *queue_create(void);
+/* Queue functions */
+queue_t *create_queue(void);
 void enqueue(queue_t *queue, void *data);
 void *dequeue(queue_t *queue);
-void queue_push_front(queue_t *queue, void *data);
+void free_queue(queue_t *queue);
 
-/* ===================== */
-/* Your function */
-/* ===================== */
+/* Pathfinding */
+queue_t *backtracking_array(char **grid, int rows, int cols,
+				point_t start, point_t goal);
 
-queue_t *backtracking_array(char **map, int rows, int cols,
-							 point_t const *start,
-							 point_t const *target);
-
-#endif /* PATHFINDING_H */
+#endif

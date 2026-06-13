@@ -1,68 +1,80 @@
-#include <stdlib.h>
 #include "pathfinding.h"
 
-queue_t *queue_create(void)
+/**
+ * create_queue - creates empty queue
+ */
+queue_t *create_queue(void)
 {
-	queue_t *q = malloc(sizeof(queue_t));
+    queue_t *q = malloc(sizeof(queue_t));
+    if (!q)
+        return NULL;
 
-	if (!q)
-		return NULL;
-
-	q->front = NULL;
-	q->rear = NULL;
-	return q;
+    q->front = NULL;
+    q->rear = NULL;
+    return q;
 }
 
+/**
+ * enqueue - adds element to queue
+ */
 void enqueue(queue_t *q, void *data)
 {
-	queue_node_t *node = malloc(sizeof(queue_node_t));
+    queue_node_t *node = malloc(sizeof(queue_node_t));
 
-	if (!q || !node)
-		return;
+    if (!q || !node)
+        return;
 
-	node->data = data;
-	node->next = NULL;
+    node->data = data;
+    node->next = NULL;
 
-	if (!q->rear)
-	{
-		q->front = q->rear = node;
-		return;
-	}
+    if (q->rear)
+        q->rear->next = node;
+    else
+        q->front = node;
 
-	q->rear->next = node;
-	q->rear = node;
+    q->rear = node;
 }
 
+/**
+ * dequeue - removes element
+ */
 void *dequeue(queue_t *q)
 {
-	queue_node_t *tmp;
-	void *data;
+    queue_node_t *tmp;
+    void *data;
 
-	if (!q || !q->front)
-		return NULL;
+    if (!q || !q->front)
+        return NULL;
 
-	tmp = q->front;
-	data = tmp->data;
-	q->front = q->front->next;
+    tmp = q->front;
+    data = tmp->data;
+    q->front = tmp->next;
 
-	if (!q->front)
-		q->rear = NULL;
+    if (!q->front)
+        q->rear = NULL;
 
-	free(tmp);
-	return data;
+    free(tmp);
+    return data;
 }
 
-void queue_push_front(queue_t *q, void *data)
+/**
+ * is_empty - checks queue
+ */
+int is_empty(queue_t *q)
 {
-	queue_node_t *node = malloc(sizeof(queue_node_t));
+    return (!q || !q->front);
+}
 
-	if (!q || !node)
-		return;
+/**
+ * free_queue - frees queue nodes only
+ */
+void free_queue(queue_t *q)
+{
+    if (!q)
+        return;
 
-	node->data = data;
-	node->next = q->front;
-	q->front = node;
+    while (!is_empty(q))
+        free(dequeue(q));
 
-	if (!q->rear)
-		q->rear = node;
+    free(q);
 }
