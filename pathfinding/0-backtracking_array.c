@@ -1,181 +1,191 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+
 #include "pathfinding.h"
 
-/* ========================= */
-/* QUEUE IMPLEMENTATION */
-/* ========================= */
-
-queue_t *queue_create(void)
+/**
+ * backtrack - recursive search
+ * @map: map
+ * @rows: number of rows
+ * @cols: number of columns
+ * @x: current x coordinate (column)
+ * @y: current y coordinate (row)
+ * @target: target point
+ * @visited: visited matrix
+ * @path: path queue
+ *
+ * Return: 1 if path found, 0 otherwise
+ */
+static int backtrack(char **map, int rows, int cols,
+		int x, int y,
+		point_t const *target,
+		char **visited,
+		queue_t *path)
 {
-	queue_t *q = malloc(sizeof(queue_t));
+	point_t *point;
 
-	if (!q)
-		return NULL;
+	(void)rows;
 
-	q->front = NULL;
-	q->rear = NULL;
-	return q;
-}
+	if (x < 0 || x >= cols || y < 0 || y >= rows)
+		return (0);
 
-void enqueue(queue_t *q, void *data)
-{
-	queue_node_t *node = malloc(sizeof(queue_node_t));
+	if (map[y][x] != '0')
+		return (0);
 
-	if (!q || !node)
-		return;
-
-	node->data = data;
-	node->next = NULL;
-
-	if (!q->rear)
-	{
-		q->front = q->rear = node;
-		return;
-	}
-
-	q->rear->next = node;
-	q->rear = node;
-}
-
-void *dequeue(queue_t *q)
-{
-	queue_node_t *tmp;
-	void *data;
-
-	if (!q || !q->front)
-		return NULL;
-
-	tmp = q->front;
-	data = tmp->data;
-	q->front = q->front->next;
-
-	if (!q->front)
-		q->rear = NULL;
-
-	free(tmp);
-	return data;
-}
-
-void queue_push_front(queue_t *q, void *data)
-{
-	queue_node_t *node = malloc(sizeof(queue_node_t));
-
-	if (!q || !node)
-		return;
-
-	node->data = data;
-	node->next = q->front;
-	q->front = node;
-
-	if (!q->rear)
-		q->rear = node;
-}
-
-/* ========================= */
-/* BACKTRACKING ARRAY */
-/* ========================= */
-
-static int is_valid(char **map, int rows, int cols,
-                    int x, int y, char **visited)
-{
-	if (x < 0 || y < 0 || x >= rows || y >= cols)
-		return 0;
-	if (map[x][y] == '1')
-		return 0;
-	if (visited[x][y])
-		return 0;
-	return 1;
-}
-
-static queue_t *dfs(char **map, int rows, int cols,
-                    int x, int y,
-                    point_t const *target,
-                    char **visited)
-{
-	queue_t *path;
-	point_t *pt;
-	int dx[4] = {0, 1, 0, -1};
-	int dy[4] = {1, 0, -1, 0};
-	int i;
-	int nx;
-	int ny;
+	if (visited[y][x])
+		return (0);
 
 	printf("Checking coordinates [%d, %d]\n", x, y);
 
-	visited[x][y] = 1;
+	visited[y][x] = 1;
 
 	if (x == target->x && y == target->y)
 	{
-		path = queue_create();
-		if (!path)
-			return NULL;
+		point = malloc(sizeof(*point));
+		if (!point)
+			return (0);
 
-		pt = malloc(sizeof(point_t));
-		if (!pt)
-			return NULL;
+		point->x = x;
+		point->y = y;
+		queue_push_front(path, point);
 
-		pt->x = x;
-		pt->y = y;
-		enqueue(path, pt);
-
-		return path;
+		return (1);
 	}
 
-	for (i = 0; i < 4; i++)
+	/* RIGHT */
+	if (backtrack(map, rows, cols, x + 1, y,
+				target, visited, path))
 	{
-		nx = x + dx[i];
-		ny = y + dy[i];
+		point = malloc(sizeof(*point));
+		if (!point)
+			return (0);
 
-		if (is_valid(map, rows, cols, nx, ny, visited))
-		{
-			path = dfs(map, rows, cols, nx, ny, target, visited);
+		point->x = x;
+		point->y = y;
+		queue_push_front(path, point);
 
-			if (path)
-			{
-				pt = malloc(sizeof(point_t));
-				if (!pt)
-					return NULL;
-
-				pt->x = x;
-				pt->y = y;
-
-				queue_push_front(path, pt);
-				return path;
-			}
-		}
+		return (1);
 	}
 
-	return NULL;
+	/* BOTTOM */
+	if (backtrack(map, rows, cols, x, y + 1,
+				target, visited, path))
+	{
+		point = malloc(sizeof(*point));
+		if (!point)
+			return (0);
+
+		point->x = x;
+		point->y = y;
+		queue_push_front(path, point);
+
+		return (1);
+	}
+
+	/* LEFT */
+	if (backtrack(map, rows, cols, x - 1, y,
+				target, visited, path))
+	{
+		point = malloc(sizeof(*point));
+		if (!point)
+			return (0);
+
+		point->x = x;
+		point->y = y;
+		queue_push_front(path, point);
+
+		return (1);
+	}
+
+	/* TOP */
+	if (backtrack(map, rows, cols, x, y - 1,
+				target, visited, path))
+	{
+		point = malloc(sizeof(*point));
+		if (!point)
+			return (0);
+
+		point->x = x;
+		point->y = y;
+		queue_push_front(path, point);
+
+		return (1);
+	}
+
+	return (0);
 }
 
-queue_t *backtracking_array(char **map, int rows, int cols,
-                             point_t const *start,
-                             point_t const *target)
+/**
+ * free_visited - frees visited matrix
+ * @visited: matrix
+ * @rows: number of rows
+ */
+static void free_visited(char **visited, int rows)
 {
-	char **visited;
-	queue_t *result;
 	int i;
+
+	for (i = 0; i < rows; i++)
+		free(visited[i]);
+
+	free(visited);
+}
+
+/**
+ * backtracking_array - finds first path using backtracking
+ * @map: map
+ * @rows: number of rows
+ * @cols: number of columns
+ * @start: start point
+ * @target: target point
+ *
+ * Return: queue containing path or NULL
+ */
+queue_t *backtracking_array(char **map, int rows, int cols,
+		point_t const *start,
+		point_t const *target)
+{
+	queue_t *path;
+	char **visited;
+	int i;
+
+	if (!map || !start || !target)
+		return (NULL);
+
+	path = queue_create();
+	if (!path)
+		return (NULL);
 
 	visited = malloc(sizeof(char *) * rows);
 	if (!visited)
-		return NULL;
+	{
+		free(path);
+		return (NULL);
+	}
 
 	for (i = 0; i < rows; i++)
 	{
 		visited[i] = calloc(cols, sizeof(char));
 		if (!visited[i])
-			return NULL;
+		{
+			while (--i >= 0)
+				free(visited[i]);
+
+			free(visited);
+			free(path);
+			return (NULL);
+		}
 	}
 
-	result = dfs(map, rows, cols,
-	             start->x, start->y,
-	             target,
-	             visited);
+	if (!backtrack(map, rows, cols,
+			start->x, start->y,
+			target, visited, path))
+	{
+		free_visited(visited, rows);
+		free(path);
+		return (NULL);
+	}
 
-	for (i = 0; i < rows; i++)
-		free(visited[i]);
-	free(visited);
+	free_visited(visited, rows);
 
-	return result;
+	return (path);
 }
