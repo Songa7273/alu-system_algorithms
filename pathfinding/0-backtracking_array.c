@@ -1,86 +1,93 @@
 #include "pathfinding.h"
 
 /**
- * add_point - store point in path
+ * backtrack_grid - Recursive helper function using backtracking over grid.
+ * @map: Pointer to a read-only 2D map array.
+ * @rows: Number of rows.
+ * @cols: Number of columns.
+ * @curr: Current structural coordinates.
+ * @target: Target destination coordinates.
+ * @visited: Tracking array for visited coordinates.
+ * @path: The collection queue holding path structures.
+ *
+ * Return: 1 if target path is resolved, 0 otherwise.
  */
-static void add_point(queue_t *path, point_t p)
+int backtrack_grid(char **map, int rows, int cols, point_t const *curr,
+		   point_t const *target, char *visited, queue_t *path)
 {
-	point_t *copy = malloc(sizeof(point_t));
+	point_t directions[4] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+	point_t *step;
+	int i;
 
-	if (!copy)
-		return;
+	if (curr->x < 0 || curr->x >= cols || curr->y < 0 || curr->y >= rows)
+		return (0);
 
-	*copy = p;
-	enqueue(path, copy);
+	if (visited[curr->y * cols + curr->x] || map[curr->y][curr->x] == '1')
+		return (0);
+
+	printf("Checking coordinates [%d, %d]\n", curr->x, curr->y);
+	visited[curr->y * cols + curr->x] = 1;
+
+	step = malloc(sizeof(point_t));
+	if (!step)
+		return (0);
+	step->x = curr->x;
+	step->y = curr->y;
+	queue_push_back(path, step);
+
+	if (curr->x == target->x && curr->y == target->y)
+		return (1);
+
+	for (i = 0; i < 4; i++)
+	{
+		point_t next = {curr->x + directions[i].x, curr->y + directions[i].y};
+
+		if (backtrack_grid(map, rows, cols, &next, target, visited, path))
+			return (1);
+	}
+
+	dequeue(path);
+	free(step);
+	return (0);
 }
 
 /**
- * BFS node
+ * backtracking_array - Finds first valid path via array backtracking.
+ * @map: Pointer to a read-only 2D array.
+ * @rows: Map row dimensions.
+ * @cols: Map column dimensions.
+ * @start: Starting point node pointer.
+ * @target: Finishing point node pointer.
+ *
+ * Return: Alloc queue pathway if valid, NULL on failure.
  */
-typedef struct bfs_node_s
+queue_t *backtracking_array(char **map, int rows, int cols,
+			    point_t const *start, point_t const *target)
 {
-	point_t p;
-	point_t parent;
-	int has_parent;
-} bfs_node_t;
+	queue_t *path;
+	char *visited;
 
-/**
- * backtracking_array - BFS shortest path
- */
-queue_t *backtracking_array(char **grid, int rows, int cols,
-				point_t start, point_t goal)
-{
-	queue_t *queue = create_queue();
-	queue_t *path = create_queue();
-	int **visited;
-	point_t dirs[4] = {{1,0},{-1,0},{0,1},{0,-1}};
-	int i, x, y;
+	if (!map || !start || !target || rows <= 0 || cols <= 0)
+		return (NULL);
 
-	visited = malloc(sizeof(int *) * rows);
-	for (i = 0; i < rows; i++)
-		visited[i] = calloc(cols, sizeof(int));
+	path = queue_create();
+	if (!path)
+		return (NULL);
 
-	enqueue(queue, &start);
-
-	while (queue->front)
+	visited = calloc(rows * cols, sizeof(char));
+	if (!visited)
 	{
-		point_t *cur = dequeue(queue);
-
-		if (cur->x == goal.x && cur->y == goal.y)
-		{
-			add_point(path, *cur);
-			break;
-		}
-
-		if (visited[cur->x][cur->y])
-			continue;
-
-		visited[cur->x][cur->y] = 1;
-		add_point(path, *cur);
-
-		for (i = 0; i < 4; i++)
-		{
-			x = cur->x + dirs[i].x;
-			y = cur->y + dirs[i].y;
-
-			if (x >= 0 && y >= 0 && x < rows && y < cols
-				&& grid[x][y] == '0')
-			{
-				point_t *next = malloc(sizeof(point_t));
-
-				next->x = x;
-				next->y = y;
-
-				enqueue(queue, next);
-			}
-		}
+		queue_delete(path);
+		return (NULL);
 	}
 
-	free_queue(queue);
+	if (!backtrack_grid(map, rows, cols, start, target, visited, path))
+	{
+		free(visited);
+		queue_delete(path);
+		return (NULL);
+	}
 
-	for (i = 0; i < rows; i++)
-		free(visited[i]);
 	free(visited);
-
 	return (path);
 }
