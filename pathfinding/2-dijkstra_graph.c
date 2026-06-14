@@ -73,6 +73,27 @@ static void init_dijkstra(graph_t *graph, vertex_t const *start, int *dist)
 }
 
 /**
+ * finalize_path - Validates target distance and assembles final path queue.
+ * @target: Target vertex pointer.
+ * @dist: Distance tracking array.
+ * @parent: Parent vertex tracking array.
+ * @path: Path queue pointer.
+ *
+ * Return: Finalized queue on success, or NULL on failure.
+ */
+static queue_t *finalize_path(vertex_t const *target, int *dist,
+			      vertex_t **parent, queue_t *path)
+{
+	if (dist[target->index] == INT_MAX ||
+	    !build_dijkstra_path(target, parent, path))
+	{
+		queue_delete(path);
+		return (NULL);
+	}
+	return (path);
+}
+
+/**
  * dijkstra_graph - Finds the shortest path in a graph using Dijkstra's.
  * @graph: Pointer to the graph to process.
  * @start: Pointer to the starting vertex.
@@ -116,12 +137,7 @@ queue_t *dijkstra_graph(graph_t *graph, vertex_t const *start,
 			}
 		}
 	}
-	if (dist[target->index] == INT_MAX ||
-	    !build_dijkstra_path(target, parent, path))
-	{
-		queue_delete(path);
-		path = NULL;
-	}
+	path = finalize_path(target, dist, parent, path);
 cleanup:
 	free(dist);
 	free(visited);
