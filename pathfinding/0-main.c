@@ -17,7 +17,7 @@ static void print_free_path(queue_t *path)
 		printf(" [%d, %d]\n", point->x, point->y);
 		free(point);
 	}
-	free(path);
+	queue_delete(path);
 }
 
 /**
@@ -27,6 +27,8 @@ static void print_free_path(queue_t *path)
  * then top, then left, then bottom, our algo will almost go through the whole
  * maze before finding a path.
  * Don't use backtracking. Backtracking is bad.
+ *
+ * Return: Always EXIT_SUCCESS.
  */
 int main(void)
 {
