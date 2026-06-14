@@ -1,34 +1,42 @@
-#include <stdlib.h>
-#include "heap.h"
 #include "huffman.h"
+#include "heap.h"
 
 /**
- * huffman_tree - builds full Huffman tree
+ * huffman_tree - Builds a complete Huffman tree from character frequencies.
+ * @data: Array of characters of size size.
+ * @freq: Array containing the associated frequencies of size size.
+ * @size: Size of the data and freq arrays.
+ *
+ * Return: Pointer to the root node of the Huffman tree, or NULL if it fails.
  */
 binary_tree_node_t *huffman_tree(char *data, size_t *freq, size_t size)
 {
-	heap_t *heap;
-	binary_tree_node_t *root;
+	heap_t *priority_queue;
+	binary_tree_node_t *huffman_root;
 
 	if (!data || !freq || size == 0)
 		return (NULL);
 
-	heap = huffman_priority_queue(data, freq, size);
-	if (!heap)
+	/* Populate your priority queue min-heap wrapper */
+	priority_queue = huffman_priority_queue(data, freq, size);
+	if (!priority_queue)
 		return (NULL);
 
-	while (heap->size > 1)
+	/* Loop extracting & combining the two min frequencies until 1 is left */
+	while (priority_queue->size > 1)
 	{
-		if (!huffman_extract_and_insert(heap))
+		if (!huffman_extract_and_insert(priority_queue))
 		{
-			heap_delete(heap, NULL);
+			heap_delete(priority_queue, NULL);
 			return (NULL);
 		}
 	}
 
-	root = heap_extract(heap);
+	/* Grab the last standing metadata payload node */
+	huffman_root = (binary_tree_node_t *)priority_queue->root->data;
 
-	heap_delete(heap, NULL);
+	/* Delete the priority queue shell structure safely */
+	heap_delete(priority_queue, NULL);
 
-	return (root);
+	return (huffman_root);
 }
