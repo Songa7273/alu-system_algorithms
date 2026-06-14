@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
+#include "queues.h"
+#include "graphs.h"
 
 /**
  * struct point_s - Structure storing coordinates
@@ -18,11 +20,8 @@ typedef struct point_s
 	int y;
 } point_t;
 
-/* Standard queue implementation types for checker reference mapping */
-#include "queues.h"
-#include "graphs.h"
-
 /* Mandatory project task prototypes */
+
 queue_t *backtracking_array(char **map, int rows, int cols,
 			    point_t const *start, point_t const *target);
 
