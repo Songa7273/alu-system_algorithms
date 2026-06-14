@@ -20,8 +20,6 @@ typedef struct point_s
 	int y;
 } point_t;
 
-/* Mandatory project task prototypes */
-
 queue_t *backtracking_array(char **map, int rows, int cols,
 			    point_t const *start, point_t const *target);
 
