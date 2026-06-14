@@ -28,6 +28,7 @@ int backtrack_grid(char **map, int rows, int cols, point_t const *curr,
 	printf("Checking coordinates [%d, %d]\n", curr->x, curr->y);
 	visited[curr->y * cols + curr->x] = 1;
 
+	/* Create a completely standalone copy of this coordinate for the queue */
 	step = malloc(sizeof(point_t));
 	if (!step)
 		return (0);
@@ -35,6 +36,7 @@ int backtrack_grid(char **map, int rows, int cols, point_t const *curr,
 	step->y = curr->y;
 	queue_push_back(path, step);
 
+	/* Target reached successfully */
 	if (curr->x == target->x && curr->y == target->y)
 		return (1);
 
@@ -49,6 +51,7 @@ int backtrack_grid(char **map, int rows, int cols, point_t const *curr,
 			return (1);
 	}
 
+	/* Backtrack: this path is a dead end. Remove it from queue and free */
 	dequeue(path);
 	free(step);
 	return (0);
