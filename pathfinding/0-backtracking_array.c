@@ -40,7 +40,10 @@ int backtrack_grid(char **map, int rows, int cols, point_t const *curr,
 
 	for (i = 0; i < 4; i++)
 	{
-		point_t next = {curr->x + directions[i].x, curr->y + directions[i].y};
+		point_t next;
+
+		next.x = curr->x + directions[i].x;
+		next.y = curr->y + directions[i].y;
 
 		if (backtrack_grid(map, rows, cols, &next, target, visited, path))
 			return (1);
