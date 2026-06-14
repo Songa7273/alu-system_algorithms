@@ -15,20 +15,18 @@
 int backtrack_grid(char **map, int rows, int cols, point_t const *curr,
 		   point_t const *target, char *visited, queue_t *path)
 {
-	point_t directions[4] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
-	point_t *step;
+	point_t dirs[4] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+	point_t *step, next;
 	int i;
 
 	if (curr->x < 0 || curr->x >= cols || curr->y < 0 || curr->y >= rows)
 		return (0);
-
 	if (visited[curr->y * cols + curr->x] || map[curr->y][curr->x] == '1')
 		return (0);
 
 	printf("Checking coordinates [%d, %d]\n", curr->x, curr->y);
 	visited[curr->y * cols + curr->x] = 1;
 
-	/* If target is found, allocate it and start building the queue path */
 	if (curr->x == target->x && curr->y == target->y)
 	{
 		step = malloc(sizeof(point_t));
@@ -42,10 +40,8 @@ int backtrack_grid(char **map, int rows, int cols, point_t const *curr,
 
 	for (i = 0; i < 4; i++)
 	{
-		point_t next;
-
-		next.x = curr->x + directions[i].x;
-		next.y = curr->y + directions[i].y;
+		next.x = curr->x + dirs[i].x;
+		next.y = curr->y + dirs[i].y;
 
 		if (backtrack_grid(map, rows, cols, &next, target, visited, path))
 		{
@@ -58,7 +54,6 @@ int backtrack_grid(char **map, int rows, int cols, point_t const *curr,
 			return (1);
 		}
 	}
-
 	return (0);
 }
 
