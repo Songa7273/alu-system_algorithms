@@ -56,7 +56,24 @@ static int build_dijkstra_path(vertex_t const *target, vertex_t **parent,
 }
 
 /**
- * dijkstra_graph - Finds the shortest path in a graph using Dijkstra's algorithm.
+ * init_dijkstra - Initializes tracking data spaces.
+ * @graph: Graph pointer.
+ * @start: Starting vertex pointer.
+ * @dist: Distance tracker array.
+ *
+ * Return: void.
+ */
+static void init_dijkstra(graph_t *graph, vertex_t const *start, int *dist)
+{
+	vertex_t *u;
+
+	for (u = graph->vertices; u; u = u->next)
+		dist[u->index] = INT_MAX;
+	dist[start->index] = 0;
+}
+
+/**
+ * dijkstra_graph - Finds the shortest path in a graph using Dijkstra's.
  * @graph: Pointer to the graph to process.
  * @start: Pointer to the starting vertex.
  * @target: Pointer to the target vertex.
@@ -70,7 +87,7 @@ queue_t *dijkstra_graph(graph_t *graph, vertex_t const *start,
 	int *dist = NULL;
 	char *visited = NULL;
 	vertex_t **parent = NULL, *u, *v;
-	edge_t *edge;
+	edge_t *e;
 
 	if (!graph || !start || !target)
 		return (NULL);
@@ -80,9 +97,7 @@ queue_t *dijkstra_graph(graph_t *graph, vertex_t const *start,
 	path = queue_create();
 	if (!dist || !visited || !parent || !path)
 		goto cleanup;
-	for (u = graph->vertices; u; u = u->next)
-		dist[u->index] = INT_MAX;
-	dist[start->index] = 0;
+	init_dijkstra(graph, start, dist);
 	while ((u = find_min_vertex(graph, dist, visited)) != NULL)
 	{
 		printf("Checking %s, distance from %s is %d\n",
@@ -90,17 +105,19 @@ queue_t *dijkstra_graph(graph_t *graph, vertex_t const *start,
 		visited[u->index] = 1;
 		if (u == target)
 			break;
-		for (edge = u->edges; edge; edge = edge->next)
+		for (e = u->edges; e; e = e->next)
 		{
-			v = edge->dest;
-			if (!visited[v->index] && dist[u->index] + edge->weight < dist[v->index])
+			v = e->dest;
+			if (!visited[v->index] &&
+			    dist[u->index] + e->weight < dist[v->index])
 			{
-				dist[v->index] = dist[u->index] + edge->weight;
+				dist[v->index] = dist[u->index] + e->weight;
 				parent[v->index] = u;
 			}
 		}
 	}
-	if (dist[target->index] == INT_MAX || !build_dijkstra_path(target, parent, path))
+	if (dist[target->index] == INT_MAX ||
+	    !build_dijkstra_path(target, parent, path))
 	{
 		queue_delete(path);
 		path = NULL;
